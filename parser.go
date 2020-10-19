@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -9,12 +10,12 @@ import (
 )
 
 type Playlist struct {
-	Url string
+	Url    string
 	Videos []Videos
 }
 
 type Videos struct {
-	Id string
+	Id  string
 	Url string
 }
 
@@ -39,9 +40,9 @@ func (u *Playlist) parseUrl() (string, error) {
 	return m["list"][0], err
 }
 
-func GetPlaylist(p *Playlist) (Playlist, int){
-    var result []string
-    var videos []Videos
+func GetPlaylist(p *Playlist) (Playlist, int) {
+	var result []string
+	var videos []Videos
 	id, err := p.parseUrl()
 	if err != nil {
 		log.Fatal(err)
@@ -56,12 +57,12 @@ func GetPlaylist(p *Playlist) (Playlist, int){
 	}
 
 	var re = regexp.MustCompile(`(?mi)\"(?:videoId)\"\:\"(?P<id>.*?)\"`)
-     for _,m:= range re.FindAllStringSubmatch(string(body), -1) {
-     	//fmt.Println(m[1], i)
-		 result = append(result, m[1])
-	 }
-    for _,r:= range unique(result) {
-     	videos = append(videos, Videos{Url: p.Url, Id: r})
+	for _, m := range re.FindAllStringSubmatch(string(body), -1) {
+		//fmt.Println(m[1], i)
+		result = append(result, m[1])
 	}
-     return Playlist{Url: p.Url, Videos: videos}, len(unique(result))
+	for _, r := range unique(result) {
+		videos = append(videos, Videos{Url: fmt.Sprintf("https://www.youtube.com/watch?v=%s", r), Id: r})
+	}
+	return Playlist{Url: p.Url, Videos: videos}, len(unique(result))
 }
