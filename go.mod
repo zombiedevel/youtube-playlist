@@ -1,4 +1,4 @@
-module youtube-playlist
+module github.com/zombiedevel/youtube-playlist
 
 go 1.14
 
